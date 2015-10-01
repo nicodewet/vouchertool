@@ -12,10 +12,10 @@ Due to the modular nature of how it has been built, in the Java space one could 
 
 Vouchertool is composed of four modules and two run-time components:
 
- * [run-time component] **vouchertool** - web application with registration and management functionality
- * [run-time component] **vouchserv-ws** - SOAP based web service
- * [module] **vouchserv-api** - client-side Java API, wsdl and XSDs 
- * [module] **vouchserv** - core Java jar with clean DTO based service layer and JPA based persistence layer
+ * [*run-time component*] **vouchertool** - web application with registration and management functionality
+ * [*run-time component*] **vouchserv-ws** - SOAP based web service
+ * [*module*] **vouchserv-api** - client-side Java API, wsdl and XSDs 
+ * [*module*] **vouchserv** - core Java jar with clean DTO based service layer and JPA based persistence layer
 
 The actual UI has been developed using Vaadin since at the time I was a full stack backend developer with the stack ending at Vaadin 
 (thank heavens for small mercies).
