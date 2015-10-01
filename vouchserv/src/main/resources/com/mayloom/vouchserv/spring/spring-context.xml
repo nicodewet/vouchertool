@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" 
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+       		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<context:annotation-config/>
+	
+    <tx:annotation-driven transaction-manager="spring-transactionManager"/>
+    
+    <bean id="vouchServDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+    	<property name="jndiName"><value>jdbc/vouchserv</value></property>
+    	<property name="resourceRef"><value>true</value></property>
+  	</bean>
+    
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceXmlLocation" value="classpath:META-INF/vouchserv-persistence.xml"/>
+        <property name="persistenceUnitName" value="vouchServ-pu"/>
+        <property name="dataSource" ref="vouchServDataSource"/>
+        <property name="jpaVendorAdapter">
+        	 <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        		<property name="databasePlatform" value="${jdbc.hibernate.dialect}"/>
+        		<property name="database" value="POSTGRESQL"/>
+        		<property name="showSql" value="false"/>
+        		<property name="generateDdl" value="true"/>
+    		</bean>
+        </property>
+        <property name="jpaProperties">
+            <props>
+            	<prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.query.startup_check">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+                <!-- Enable the second-level cache  
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
+				<prop key="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</prop>
+				-->
+            </props>
+        </property>
+        <property name="jpaDialect">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+        </property>
+        <property name="loadTimeWeaver">
+            <bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
+        </property>
+    </bean>
+    
+   
+    
+    <bean id="spring-transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <property name="dataSource" ref="vouchServDataSource"/>
+    </bean>
+    
+    <!-- User Beans -->
+    
+    <bean id="databaseHelper" class="com.mayloom.vouchserv.dbo.DatabaseHelperImp">
+    	<property name="randomStringGenerator" ref="randomStringGenerator"/>
+    	<property name="uniquePinGenerationTimeout" value="${vouchserv.unique.pin.gen.milli.timeout}"/>
+    </bean>
+    
+    <bean id="bulkOpDatabaseHelper" class="com.mayloom.vouchserv.dbo.BulkOpDatabaseHelperImp">
+    </bean>
+    
+    <bean id="voucherService" class="com.mayloom.vouchserv.imp.VoucherServiceImp">
+    	<constructor-arg type="com.mayloom.vouchserv.api.VoucherPinAmount" value="ONE_TRILLION"/>
+    	<property name="generationServer" ref="generationServer"/>
+    	<property name="databaseHelper" ref="databaseHelper"/>
+    	<property name="bulkOpDatabaseHelper" ref="bulkOpDatabaseHelper"/>
+    	<property name="mapper" ref="mapper"/>
+    	<property name="vsvIdTool" ref="identifierTool"/>
+    </bean>
+    
+    <bean id="generationServer" class="com.mayloom.vouchserv.imp.GenerationServerImp">
+    	<constructor-arg value="5"/>
+    	<constructor-arg value="5"/>
+   		<property name="databaseHelper" ref="databaseHelper"/>
+    </bean>
+    
+    <bean id="mapper" class="org.dozer.DozerBeanMapper">
+    	<property name="mappingFiles">
+        <list>
+            <value>com/mayloom/vouchserv/dozer/dozer-bean-mappings.xml</value>
+        </list>
+    	</property>
+	</bean>
+    
+    <bean id="randomStringGenerator" class="com.mayloom.vouchserv.gen.RandomStringGeneratorImpl"/>
+    
+    <bean id="identifierTool" class="com.mayloom.vouchserv.gen.IdentifierToolImpl"/>	
+	<!-- Properties -->
+
+    <context:property-placeholder location="classpath:vouchserv.properties"/>
+
+</beans>

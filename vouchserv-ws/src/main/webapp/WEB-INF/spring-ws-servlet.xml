@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:sws="http://www.springframework.org/schema/web-services"
+  xmlns:security="http://www.springframework.org/schema/security"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+  http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+  http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd" default-init-method="init">
+
+	<description>
+        This web application context contains Spring-WS beans. The beans defined in this context are automatically
+        detected by Spring-WS, similar to the way Controllers are picked up in Spring Web MVC.
+    </description>
+    
+    <security:global-method-security pre-post-annotations="enabled"/>
+    
+	<import resource="classpath:com/mayloom/vouchserv/spring/spring-context.xml"/>
+	
+	<context:component-scan base-package="com.mayloom.vouchserv"/>
+	
+    <sws:annotation-driven/>
+  
+	<sws:static-wsdl id="vouchserv" location="/WEB-INF/wsdl/vouchserv.wsdl"/>
+	
+	<!-- 
+	<sws:dynamic-wsdl id="vouchserv" portTypeName="VoucherService" locationUri="/"
+                      targetNamespace="http://vouchertool.com/vouchserv/definitions">
+        <sws:xsd location="/WEB-INF/vouchserv.xsd"/>
+    </sws:dynamic-wsdl>
+    -->
+      
+    <sws:interceptors>
+    	<bean id="validatingInterceptor"
+        	class="org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor">
+    		<property name="schema" value="/WEB-INF/wsdl/vouchserv.xsd"/>
+    		<property name="validateRequest" value="true"/>
+    		<property name="validateResponse" value="true"/>
+		</bean>
+		
+		<!-- HitCountInterceptor-->
+		<bean id="hitCountInterceptor" class="com.mayloom.vouchserv.ws.intercept.UsernameRequestLoggingInterceptor">
+			<property name="requestHitCounter" ref="requestHitCounter" />
+		</bean> 
+		
+		<bean id="rateLimitInterceptor" class="com.mayloom.vouchserv.ws.intercept.UserRequestRateControlInterceptor">
+			<property name="requestHitCounter" ref="requestHitCounter" />
+		</bean> 
+		
+		<bean id="wsSecurityInterceptor"
+        	class="org.springframework.ws.soap.security.xwss.XwsSecurityInterceptor">
+        	<property name="policyConfiguration" value="classpath:securityPolicy.xml"/>
+        	<property name="callbackHandlers">
+            	<list>
+                	<ref bean="springSecurityHandler"/>
+            	</list>
+        	</property>
+    	</bean>
+    	   	
+    </sws:interceptors>
+    
+    <bean id="springSecurityHandler"
+      class="org.springframework.ws.soap.security.xwss.callback.SpringPlainTextPasswordValidationCallbackHandler">
+    	<property name="authenticationManager" ref="authenticationManager"/>
+  	</bean>
+    
+    <bean id="authenticationManager"
+		class="org.springframework.security.authentication.ProviderManager">
+		<property name="providers">
+			<list>
+				<ref local="daoAuthenticationProvider"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="daoAuthenticationProvider"
+		class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+		<property name="userDetailsService" ref="inMemoryDaoImpl"/>
+	</bean>
+    
+    <bean id="inMemoryDaoImpl" class="com.mayloom.vouchserv.user.UserDetailsServiceImpl"/>
+    
+    <!-- http://static.springsource.org/spring-ws/site/reference/html/server.html#server-endpoint-exception-resolver -->
+    <bean id="exceptionResolver" class="com.mayloom.vouchserv.ws.LoggingSoapFaultMappingExceptionResolver">
+        <property name="defaultFault" value="SERVER, An error occurred"/>
+        <!-- 
+        <property name="exceptionMappings">
+            <value>
+                org.springframework.oxm.ValidationFailureException=CLIENT,Invalid request
+            </value>
+        </property>
+         -->
+    </bean>
+    
+	<bean id="requestHitCounter" class="com.mayloom.vouchserv.ws.hit.RequestHitCounterImpl" />
+	
+	<bean id="userInitBean" class="com.mayloom.vouchserv.user.UserConfig" />
+	
+	<bean name="voucherServiceManagementService" class="com.mayloom.vouchserv.man.VoucherServiceManagementImpl">
+		<constructor-arg name="voucherService" ref="voucherService"/>
+		<constructor-arg name="databaseHelper" ref="databaseHelper"/>
+	</bean>
+	
+	<bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="voucherServiceManagement" />
+		<property name="serviceInterface" value="com.mayloom.vouchserv.man.api.VoucherServiceManagement" />
+		<property name="service" ref="voucherServiceManagementService" />
+		<property name="registryPort" value="8084" />
+		<!--  
+		<property name="registryHost" value="localhost" />
+		-->
+	</bean>
+	
+</beans>

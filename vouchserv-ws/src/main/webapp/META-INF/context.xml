@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/vouchserv-ws">
+  <!-- http://tomcat.apache.org/tomcat-7.0-doc/jndi-datasource-examples-howto.html -->
+  <Resource name="jdbc/vouchserv" auth="Container" type="javax.sql.DataSource"
+               maxActive="50" maxIdle="30" maxWait="10000" removeAbandoned="true"
+               testOnBorrow="true" validationQuery="SELECT 1" username="vouchserv" password="vouchserv" 
+               driverClassName="org.postgresql.Driver"
+               url="jdbc:postgresql://localhost:5432/vouchserv"/> 
+</Context>

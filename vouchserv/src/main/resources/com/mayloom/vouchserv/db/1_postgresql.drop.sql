@@ -1,0 +1,13 @@
+alter table "USER_ROLE" drop constraint FKBC16F46A79053263;
+alter table "USER_ROLE" drop constraint FKBC16F46A1E2FF643;
+alter table "VOUCHER_BATCH_OWNER" drop constraint FKC09514FD1E2FF643;
+alter table "VOUCHER_BATCH" drop constraint FK298ABA29FBB3DEB5;
+alter table "VOUCHER" drop constraint FK50F41A8EFBB3DEB5;
+alter table "VOUCHER" drop constraint FK50F41A8E729BD746;
+drop table "ROLE" cascade;
+drop table "USER_ROLE" cascade;
+drop table "USER" cascade;
+drop table "VOUCHER_BATCH_OWNER" cascade;
+drop table "VOUCHER_BATCH" cascade;
+drop table "VOUCHER" cascade;
+drop sequence hibernate_sequence;

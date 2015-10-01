@@ -1,0 +1,11 @@
+3. Constraint Violation exception upon startup (insert nico@vouchertool.com) - investigate
+4. Email service interface - create
+5. Email service impl (sendgrid) - create, should have the ability to be disabled depending on the environment OR app 
+	should select impl depending on env
+6. Configurable monitor email account - create
+7. Use email service to send email to accnt in 6. when user registers and when free code gen form is used
+8. Use email service to send stack trace emails
+
+OTHER
+
+1. Add feature to optionally remove look alikes from generated codes - might want to add this to vouchserv

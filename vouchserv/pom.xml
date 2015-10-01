@@ -1,0 +1,441 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.mayloom</groupId>
+  <artifactId>vouchserv</artifactId>
+  <version>0.0.44-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>vouchserv</name>
+  <description>Multi-user voucher management service.</description>
+  <url>http://www.mayloom.com</url>
+  <distributionManagement>
+    <repository>
+      <id>mayloom.svn.cvsdude.com</id>
+      <url>svn:https://mayloom.svn.cvsdude.com/toolsuite/repository</url>
+    </repository>
+  </distributionManagement>
+  <scm>
+  	<!--
+  			mvn release:prepare -Dresume=false
+  			mvn release:perform  
+  			mvn install -DskipITs=true
+  	-->
+    <connection>scm:svn:https://mayloom.svn.cvsdude.com/toolsuite/component/vouchserv/trunk</connection>
+    <developerConnection>scm:svn:https://mayloom.svn.cvsdude.com/toolsuite/component/vouchserv/trunk</developerConnection>
+    <url>https://mayloom.browse.cvsdude.com/cgi-bin/toolsuite/component/vouchserv</url>
+  </scm>
+
+  <properties>
+  	<skipITs>false</skipITs>
+  	<vouchserv.man.api.version>0.0.2</vouchserv.man.api.version>
+    <org.springframework.version>3.1.0.RELEASE</org.springframework.version>
+    <junit.version>4.10</junit.version>
+    <apache.commons.lang.version>2.6</apache.commons.lang.version>
+    <hsqldb.version>2.0.0</hsqldb.version>
+    <apache.commons.dbcp.version>1.4</apache.commons.dbcp.version>
+    <db.server.name>localhost</db.server.name>
+    <db.server.port>5432</db.server.port>
+    <db.server.db.name>vouchservtest</db.server.db.name>
+    <db.server.db.username>vouchservtest</db.server.db.username>
+    <db.server.db.password>vouchservtest</db.server.db.password>
+    <postgresql.jdbc.version>9.1-901.jdbc4</postgresql.jdbc.version>
+  	<ehcache.version>2.4.7</ehcache.version>
+    <!-- Project build output directory required for maven-antrun-plugin -->
+    <project.build.outputDirectory>target</project.build.outputDirectory>
+  </properties>
+  
+  <repositories>
+  	<repository>
+  		<id>springsource</id>
+  		<url>http://maven.springframework.org/snapshot</url>
+  		<releases><enabled>true</enabled></releases>
+  		<snapshots><enabled>false</enabled></snapshots>
+  	</repository>
+  	<repository>
+  		<id>repo1-maven</id>
+  		<url>http://repo1.maven.org</url>
+  		<releases><enabled>true</enabled></releases>
+  		<snapshots><enabled>false</enabled></snapshots>
+  	</repository>
+  	<repository>
+        <id>jboss-public-repository-group</id>
+        <url>https://repository.jboss.org/nexus/content/groups/public-jboss</url>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>
+     </repository>
+     <repository>
+   		<id>terracotta-releases</id>
+   		<url>http://www.terracotta.org/download/reflector/releases</url>
+   		<releases><enabled>true</enabled></releases>
+   		<snapshots><enabled>false</enabled></snapshots>
+	</repository>
+  </repositories>
+  
+  <pluginRepositories>
+  	<pluginRepository>
+  	<id>springsource</id>
+  	<url>http://maven.springframework.org/snapshot</url>
+  	</pluginRepository>
+  </pluginRepositories>
+  
+   <profiles>
+   <profile>
+     <id>test</id>
+     <build>
+       <plugins>
+         <plugin>
+           <artifactId>maven-antrun-plugin</artifactId>
+           <executions>
+             <execution>
+               <phase>test</phase>
+               <goals>
+                 <goal>run</goal>
+               </goals>
+               <configuration>
+                 <tasks>
+                   <delete file="${project.build.outputDirectory}/environment.properties" />
+                   <copy file="src/main/resources/environment.test.properties" tofile="${project.build.outputDirectory}/environment.properties" />
+                 </tasks>
+               </configuration>
+             </execution>
+           </executions>
+         </plugin>
+         <plugin>
+           <artifactId>maven-surefire-plugin</artifactId>
+           <version>2.8.1</version>
+           <configuration>
+             <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+           </configuration>
+         </plugin>
+         <plugin>
+           <artifactId>maven-jar-plugin</artifactId>
+           <executions>
+             <execution>
+               <phase>package</phase>
+               <goals>
+                 <goal>jar</goal>
+               </goals>
+               <configuration>
+                 <classifier>test</classifier>
+               </configuration>
+             </execution>
+           </executions>
+         </plugin>
+       </plugins>
+     </build>
+   </profile>
+ </profiles>
+  
+   <inceptionYear>April 2011</inceptionYear>
+   <organization>
+   	<name>MAYLOOM</name>
+   	<url>http://www.mayloom.com</url>
+   </organization>
+   
+  <!-- ***** BUILD ***** -->
+  <build>
+    <plugins>
+    
+    	<plugin>
+        	<artifactId>maven-assembly-plugin</artifactId>
+        	<version>2.3</version>
+        	<configuration>
+          		<descriptors>
+            		<descriptor>src/main/assembly/assembly.xml</descriptor>
+          		</descriptors>
+        	</configuration>
+        	<executions>
+          		<execution>
+            		<id>make-assembly</id> <!-- this is used for inheritance merges -->
+            		<phase>package</phase> <!-- bind to the packaging phase -->
+            		<goals>
+              			<goal>single</goal>
+            		</goals>
+          		</execution>
+        	</executions>
+        </plugin>
+    	<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <!-- http://maven.apache.org/plugins/maven-deploy-plugin/ -->
+            <version>2.7</version>
+            <dependencies>
+                <dependency>
+                    <groupId>com.google.code.maven-svn-wagon</groupId>
+                    <artifactId>maven-svn-wagon</artifactId>
+                    <version>1.4</version>
+                </dependency>
+            </dependencies>
+        </plugin>  
+   		<plugin>
+			<groupId>org.codehaus.mojo</groupId>
+               <artifactId>sql-maven-plugin</artifactId>
+               <dependencies>                   
+                   <dependency>
+				   		<groupId>postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>${postgresql.jdbc.version}</version>
+				   </dependency>
+               </dependencies>
+               <configuration>
+                   <driver>org.postgresql.Driver</driver>
+                   <url>jdbc:postgresql://${db.server.name}:${db.server.port}/${db.server.db.name}</url>
+                   <username>${db.server.db.username}</username>
+         			<password>${db.server.db.password}</password>
+         			<skip>${skipITs}</skip>
+               </configuration>
+               <executions>
+				<execution>
+                       <id>create-db-before-test</id>
+                       <phase>pre-integration-test</phase>
+                       <goals>
+                           <goal>execute</goal>
+                       </goals>
+                       <configuration>
+                           <orderFile>ascending</orderFile>
+                           <fileset>
+                               <basedir>${basedir}/src/main/resources/com/mayloom/vouchserv/db</basedir>
+                               <includes>
+                               	   <include>1_postgresql.drop.sql</include>
+                                   <include>2_postgresql.create.sql</include>
+                                   <include>3_postgresql.alter.sql</include>
+                               </includes>
+                           </fileset>
+                       </configuration>
+                   </execution>
+               </executions>
+        </plugin>
+        <plugin>
+   			<artifactId>maven-surefire-plugin</artifactId>
+   		</plugin>
+        
+        <plugin>
+        		<groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-failsafe-plugin</artifactId>
+        		<version>2.12</version>
+        		<configuration>
+        			<skipITs>${skipITs}</skipITs>
+        		</configuration>
+        		<executions>
+          			<execution>
+            			<goals>
+              				<goal>integration-test</goal>
+              				<goal>verify</goal>
+            			</goals>
+          			</execution>
+        		</executions>
+      	</plugin>
+    
+ 		<plugin>
+ 		  <groupId>org.apache.maven.plugins</groupId>
+       	  <artifactId>maven-compiler-plugin</artifactId>
+       	  <version>2.3.2</version>
+ 		</plugin>
+ 		
+ 		<!-- Optional, include this piece for integration with Eclipse -->
+ 		<plugin>
+   		  <groupId>org.apache.maven.plugins</groupId>
+       	  <artifactId>maven-eclipse-plugin</artifactId>
+       	  <version>2.8</version>    		
+ 		</plugin>
+ 		
+ 		<plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.2.1</version>          
+          <configuration>
+          	<tagBase>https://mayloom.svn.cvsdude.com/toolsuite/component/vouchserv/tags</tagBase>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <excludes>
+            <exclude>**/logback.xml</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+ 		
+    </plugins>
+  </build>
+  
+  <dependencies>
+  
+	<dependency>
+		<groupId>com.mayloom</groupId>
+  		<artifactId>vouchserv-man-api</artifactId>
+  		<version>${vouchserv.man.api.version}</version>
+	</dependency>
+
+    <!-- Apache Commons -->
+    
+    <dependency>
+    	<groupId>commons-lang</groupId>
+    	<artifactId>commons-lang</artifactId>
+    	<version>${apache.commons.lang.version}</version>
+	</dependency>
+    
+    <!-- Spring -->
+    
+    <dependency>
+		<groupId>org.springframework.security</groupId>
+		<artifactId>spring-security-core</artifactId>
+		<version>3.0.7.RELEASE</version>
+		 <exclusions>
+		 		<!-- http://stackoverflow.com/questions/8943581/maven-dependency-spring-classpath-issue -->
+		 		<exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-expression</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+            </exclusions>
+	</dependency>
+    
+	<!--
+    Application Context (depends on spring-core, spring-expression, spring-aop, spring-beans)
+    This is the central artifact for Spring's Dependency Injection Container and is generally 
+      always defined
+	-->
+	<dependency>
+  		<groupId>org.springframework</groupId>
+  		<artifactId>spring-context</artifactId>
+  		<version>${org.springframework.version}</version>
+	</dependency>
+	<dependency>
+  		<groupId>org.springframework</groupId>
+  		<artifactId>spring-expression</artifactId>
+  		<version>${org.springframework.version}</version>
+	</dependency>
+	<!--
+    Transaction Management Abstraction (depends on spring-core, spring-beans, spring-aop, spring-context)
+    Define this if you use Spring Transactions or DAO Exception Hierarchy
+      (org.springframework.transaction.*/org.springframework.dao.*)
+	-->
+	<dependency>
+  		<groupId>org.springframework</groupId>
+  		<artifactId>spring-tx</artifactId>
+  		<version>${org.springframework.version}</version>
+	</dependency>
+	
+	<!-- Object-to-Relation-Mapping (ORM) integration with Hibernate, JPA and iBatis.
+    (depends on spring-core, spring-beans, spring-context, spring-tx)
+    Define this if you need ORM (org.springframework.orm.*)-->
+	<dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-orm</artifactId>
+    	<version>${org.springframework.version}</version>
+	</dependency>
+	
+    <!-- JDBC / DB -->
+    	
+	<dependency>
+		<groupId>postgresql</groupId>
+		<artifactId>postgresql</artifactId>
+		<version>${postgresql.jdbc.version}</version>
+	</dependency>
+            
+    <dependency>
+        <groupId>org.hsqldb</groupId>
+        <artifactId>hsqldb</artifactId>
+        <version>${hsqldb.version}</version>
+        <scope>test</scope>
+	</dependency>
+	
+	<dependency>
+		<groupId>commons-dbcp</groupId>
+		<artifactId>commons-dbcp</artifactId>
+		<version>${apache.commons.dbcp.version}</version>
+		<scope>test</scope>
+	</dependency>
+
+	<!--  HIBERNATE -->
+	 
+	<dependency>
+   		<groupId>org.hibernate</groupId>
+   		<artifactId>hibernate-core</artifactId> <!-- hibernate-annotations merged in -->
+   		<version>3.6.8.Final</version>
+	</dependency>
+	 <dependency>
+       <groupId>org.hibernate</groupId>
+       <artifactId>hibernate-entitymanager</artifactId>
+       <version>3.6.8.Final</version>
+    </dependency> 
+    <dependency>
+   		<groupId>net.sf.ehcache</groupId>
+   		<artifactId>ehcache-core</artifactId>
+   		<version>${ehcache.version}</version>
+	</dependency>
+	
+	<!-- Logging -->
+	
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+		<version>1.6.1</version>
+	</dependency>
+	
+	<dependency>
+    	<groupId>ch.qos.logback</groupId>
+    	<artifactId>logback-classic</artifactId>
+    	<version>0.9.27</version>
+	</dependency>
+	
+	<dependency>
+    	<groupId>ch.qos.logback</groupId>
+    	<artifactId>logback-core</artifactId>
+    	<version>0.9.27</version>
+	</dependency>
+	
+	<!-- DTO -->
+	
+	<dependency>
+    	<groupId>net.sf.dozer</groupId>
+    	<artifactId>dozer</artifactId>
+    	<version>5.3.2</version>
+	</dependency>
+	
+	<!-- Testing -->
+	
+	 <dependency>
+      	<groupId>junit</groupId>
+      	<artifactId>junit</artifactId>
+     	<version>${junit.version}</version>
+      	<scope>test</scope>
+     </dependency>
+    
+     <dependency>
+     	<groupId>org.springframework</groupId>
+     	<artifactId>spring-test</artifactId>
+     	<version>${org.springframework.version}</version>
+     	<scope>test</scope>
+     </dependency>
+     
+     <!-- Other Utilities -->
+     
+     <dependency>
+    	<groupId>joda-time</groupId>
+    	<artifactId>joda-time</artifactId>
+    	<version>1.6.2</version>
+    	<scope>compile</scope>
+	 </dependency>
+	 
+	 <dependency>
+    		<groupId>com.google.guava</groupId>
+    		<artifactId>guava</artifactId>
+    		<version>12.0</version>
+	 </dependency>
+	
+  </dependencies>
+  
+</project>

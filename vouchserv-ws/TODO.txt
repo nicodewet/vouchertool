@@ -1,0 +1,34 @@
+1. Exposing implementation details when no security header specified
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+   <SOAP-ENV:Header/>
+   <SOAP-ENV:Body>
+      <SOAP-ENV:Fault>
+         <faultcode>SOAP-ENV:Client</faultcode>
+         <faultstring xml:lang="en">com.sun.xml.wss.XWSSecurityException: Message does not conform to configured policy [ AuthenticationTokenPolicy(S) ]:  No Security Header found; nested exception is com.sun.xml.wss.XWSSecurityException: com.sun.xml.wss.XWSSecurityException: Message does not conform to configured policy [ AuthenticationTokenPolicy(S) ]:  No Security Header found</faultstring>
+      </SOAP-ENV:Fault>
+   </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+3. When sending Register request with totally unknown user, we expose impl logic:
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+   <SOAP-ENV:Header/>
+   <SOAP-ENV:Body>
+      <SOAP-ENV:Fault>
+         <faultcode>SOAP-ENV:Client</faultcode>
+         <faultstring xml:lang="en">com.sun.xml.wss.impl.WssSoapFaultException: Authentication of Username Password Token Failed; nested exception is com.sun.xml.wss.XWSSecurityException: com.sun.xml.wss.impl.WssSoapFaultException: Authentication of Username Password Token Failed</faultstring>
+      </SOAP-ENV:Fault>
+   </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+06:14:49.383 [http-bio-8080-exec-33] ERROR c.m.v.user.UserDetailsServiceImpl - There is no user with username nico@nicodewetrrrrr.com
+Jul 23, 2012 6:14:49 AM com.sun.xml.wss.impl.filter.AuthenticationTokenFilter getUserNameTokenFromMessage
+SEVERE: WSS1408: UsernameToken Authentication Failed
+Jul 23, 2012 6:14:49 AM org.springframework.ws.soap.security.AbstractWsSecurityInterceptor handleValidationException
+WARNING: Could not validate request: com.sun.xml.wss.impl.WssSoapFaultException: Authentication of Username Password Token Failed; 
+nested exception is com.sun.xml.wss.XWSSecurityException: com.sun.xml.wss.impl.WssSoapFaultException: Authentication of Username Password Token Failed
+
+4. Excessive logging by LoggingSoapFaultMappingExceptionResolver when processing org.springframework.security.access.AccessDeniedException: Access is denied
+
+5. running service over https

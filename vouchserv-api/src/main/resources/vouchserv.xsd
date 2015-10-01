@@ -1,0 +1,520 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:vsv="http://vouchertool.com/vouchserv/schemas"
+        elementFormDefault="qualified"
+        targetNamespace="http://vouchertool.com/vouchserv/schemas"
+        version="1.0">
+<xs:annotation>
+<xs:documentation xml:lang="en">
+The VoucherTool (http://www.vouchertool.com) Voucher Service XSD. Copyright (c) by Nico Dirk de Wet 2011 - 2013. All Rights Reserved.
+
+Author: Nico Dirk de Wet (http://www.nicodewet.com)
+
+The Voucher Service is a value-agnostic voucher management service specifically designed to be used in the Content Enricher Enterprise
+Integration Pattern. This generic, value-agnostic service serves as a highly re-usable component in a Service Oriented Architecture. 
+GetVoucherRequest and GetVoucherResponse are essential operation when it comes to the Voucher Service being used in the Content Enricher 
+Enterprise Integration Pattern as envisioned. GetVoucherResponse returns an element of type ContentEnricherVoucher (extends Voucher Type 
+to include a batchNumber element). This element is essential when using the Content Enricher Enterprise Integration  Pattern since the Voucher 
+Service is value agnostic (by design). In the event of voucher redemption, having validated the voucher, the batchNumber can be used to enrich 
+further, for example to determine the value (monetary or otherwise) of the VoucherBatch, in which case a separate data source (or service) may 
+be used for this purpose.
+</xs:documentation>
+</xs:annotation>
+
+<xs:annotation>
+	<xs:documentation>=== CORE TYPES ===</xs:documentation>
+</xs:annotation>
+
+<xs:complexType name="VoucherBatch">
+	<xs:all minOccurs="1" maxOccurs="1">
+	    <xs:element name="voucherList">
+			<xs:complexType>
+				<xs:sequence minOccurs="1" maxOccurs="unbounded">
+					<xs:element name="voucher" type="vsv:Voucher"/> 
+				</xs:sequence>
+			</xs:complexType>
+		</xs:element>
+		<xs:element name="batchNumber" type="xs:positiveInteger"/>
+		<xs:element name="expiryDate" type="xs:dateTime" nillable="true"/>
+		<xs:element name="active" type="xs:boolean"/>
+		<xs:element name="creationDate" type="xs:dateTime"/>
+	</xs:all>
+</xs:complexType>
+
+<xs:complexType name="Voucher">
+ <xs:sequence>
+ 	<xs:element name="pin" type="xs:string"/>
+ 	<xs:element name="serialNumber" type="xs:long"/>
+ 	<xs:element name="expiryDate" type="xs:dateTime" nillable="true"/>
+ 	<xs:element name="active" type="xs:boolean"/>
+ 	<xs:element name="redemptionDate" type="xs:dateTime" nillable="true"/>
+ </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ContentEnricherVoucher"> 
+    <xs:complexContent> 
+        <xs:extension base="vsv:Voucher"> 
+            <xs:sequence> 
+                <xs:element name="batchNumber" type="xs:positiveInteger"/>  
+            </xs:sequence> 
+        </xs:extension> 
+    </xs:complexContent> 
+</xs:complexType>  
+
+<xs:simpleType name="ResultStatusCode">
+	<xs:annotation>
+		<xs:documentation>Result status code common to all API Response elements</xs:documentation>
+	</xs:annotation>
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="0">
+        	<xs:annotation>
+        		<xs:documentation>SUCCESS</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="1">
+        	<xs:annotation>
+        		<xs:documentation>FAIL</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="SerialNumberType">
+	<xs:restriction base="xs:positiveInteger">
+		<xs:minInclusive value="1"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="ErrorCode">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="100">
+        	<xs:annotation>
+        		<xs:documentation>VSV-ID INVALID</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:annotation>
+	<xs:documentation>=== API: Request / Response Pairs ===</xs:documentation>
+</xs:annotation>
+
+<xs:simpleType name="VoucherServiceIdType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="VSV-ID[0-9]{17}"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:element name="RegisterRequest">
+	<xs:annotation>
+		<xs:documentation>REGISTRATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:complexContent>
+			<xs:restriction base="xs:anyType" />
+		</xs:complexContent>
+	</xs:complexType>
+</xs:element>
+<xs:element name="RegisterResponse">
+	<xs:annotation>
+		<xs:documentation>REGISTRATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="vsvID" minOccurs="1" maxOccurs="1" type="vsv:VoucherServiceIdType"/>
+			<xs:element name="resultStatusCode" minOccurs="1" maxOccurs="1" type="vsv:ResultStatusCode"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:simpleType name="VoucherBatchType">
+	<xs:restriction base="xs:string">
+        <xs:enumeration value="REGULAR">
+        	<xs:annotation>
+        		<xs:documentation>Initial state: VoucherBatch inactive, Vouchers active</xs:documentation>	
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="JUST_IN_TIME">
+        	<xs:annotation>
+        		<xs:documentation>Initial state: VoucherBatch active, Vouchers inactive</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+ 	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="PinType">
+	<xs:restriction base="xs:string">
+        <xs:enumeration value="NUMERIC">
+        	<xs:annotation>
+        		<xs:documentation>Pin composed entirely of digits ranging from 0 to 9.</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="ALPHANUMERIC_UPPER_CASE">
+        	<xs:annotation>
+        		<xs:documentation>Pin composed of upper case alphabetic characters A to Z and digits 0 to 9.</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="ALPHANUMERIC_MIXED_CASE">
+	 		<xs:annotation>
+	 			<xs:documentation>Pin composed of upper case and lower case alphabetic characters a to z and A to Z, and digits 0 to 9.</xs:documentation>
+	 		</xs:annotation>
+		</xs:enumeration>	 															
+ 	</xs:restriction>
+</xs:simpleType>
+        
+<xs:element name="VoucherBatchGenerationRequest">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH GENERATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="vsvID" minOccurs="1" maxOccurs="1" type="vsv:VoucherServiceIdType"/>
+			<xs:element name="voucherNumber" minOccurs="1" maxOccurs="1" type="xs:positiveInteger"/>
+			<xs:element name="batchType" minOccurs="1" maxOccurs="1" type="vsv:VoucherBatchType"/>
+		
+			<xs:element name="pinLength" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Optional parameters - initialised to default values</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+    				<xs:restriction base="xs:integer">
+      					<xs:minInclusive value="6"/>
+      					<xs:maxInclusive value="30"/>
+    				</xs:restriction>
+  				</xs:simpleType>
+  			</xs:element>
+			
+			<xs:element name="pinType" minOccurs="0" maxOccurs="1" type="vsv:PinType"/>
+			<xs:element name="expiryDate" minOccurs="0" maxOccurs="1" type="xs:dateTime"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="VoucherBatchGenerationResponse">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH GENERATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+    		<xs:element name="batchNumber" minOccurs="1" maxOccurs="1" type="xs:positiveInteger"/>
+			<xs:element name="resultStatusCode" minOccurs="1" maxOccurs="1" type="vsv:ResultStatusCode"/>
+			<xs:element name="batchGenerationErrorList">
+				<xs:complexType>
+					<xs:sequence minOccurs="0" maxOccurs="1">
+						<xs:element name="batchGenerationErrorCode" type="vsv:BatchGenerationErrorCode"/> 
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:simpleType name="BatchGenerationErrorCode">
+    <xs:union memberTypes="vsv:ErrorCode vsv:BatchGenerationSpecificErrorCode"/>
+</xs:simpleType>
+
+<xs:simpleType name="BatchGenerationSpecificErrorCode">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="200">
+        	<xs:annotation>
+        		<xs:documentation>BATCH SIZE LIMIT EXCEEDED, MAX 1000</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="201">
+        	<xs:annotation>
+        		<xs:documentation>BATCH SIZE MUST BE GREATER THAN ZERO</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="202">
+        	<xs:annotation>
+        		<xs:documentation>BATCH EXPIRY DATE IN PAST</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="203">
+        	<xs:annotation>
+        		<xs:documentation>INVALID PIN LENGTH, MUST BE 6 TO 30</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:element name="GetVoucherBatchRequest">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH FETCH</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="vsvID" minOccurs="1" maxOccurs="1" type="vsv:VoucherServiceIdType"/>
+			<xs:element name="batchNumber" minOccurs="1" maxOccurs="1" type="xs:positiveInteger"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="GetVoucherBatchResponse">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH FETCH</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="voucherBatch" minOccurs="0" maxOccurs="1" type="vsv:VoucherBatch"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="GetVoucherRequest">
+	<xs:annotation>
+		<xs:documentation>VOUCHER FETCH</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="vsvID" minOccurs="1" maxOccurs="1" type="vsv:VoucherServiceIdType"/>
+			<xs:choice>
+				<xs:element name="pin" type="xs:string"/>
+ 				<xs:element name="serialNumber" type="xs:long"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:simpleType name="VoucherErrorCode">
+    <xs:restriction base="xs:string">
+		<xs:enumeration value="305">
+			<xs:annotation>
+				<xs:documentation>VOUCHER DOES NOT EXIST</xs:documentation>
+			</xs:annotation>
+		</xs:enumeration>        
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="VoucherReferenceErrorCode">
+     <xs:union memberTypes="vsv:ErrorCode vsv:VoucherErrorCode"/>
+</xs:simpleType>
+
+<xs:element name="GetVoucherResponse">
+	<xs:annotation>
+		<xs:documentation>VOUCHER FETCH</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="voucher" type="vsv:ContentEnricherVoucher"/>
+				<xs:element name="errorCode" type="vsv:VoucherReferenceErrorCode"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="ActivateVoucherBatchRequest">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH ACTIVATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="vsvID" minOccurs="1" maxOccurs="1" type="vsv:VoucherServiceIdType"/>
+			<xs:element name="batchNumber" minOccurs="1" maxOccurs="1" type="xs:positiveInteger"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:simpleType name="BatchActivationSpecificErrorCode">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="400">
+        	<xs:annotation>
+        		<xs:documentation>INVALID BATCH NUMBER</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="401">
+        	<xs:annotation>
+        		<xs:documentation>BATCH DOES NOT EXIST</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="402">
+        	<xs:annotation>
+        		<xs:documentation>BATCH ALREADY ACTIVE</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="403">
+        	<xs:annotation>
+        		<xs:documentation>BATCH ALREADY INACTIVE</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="BatchActivationErrorCode">
+    <xs:union memberTypes="vsv:ErrorCode vsv:BatchActivationSpecificErrorCode"/>
+</xs:simpleType>
+
+<xs:element name="ActivateVoucherBatchResponse">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH ACTIVATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="batchNumber" minOccurs="1" maxOccurs="1" type="xs:positiveInteger"/>
+			<xs:element name="resultStatusCode" minOccurs="1" maxOccurs="1" type="vsv:ResultStatusCode"/>
+			<xs:element name="errorCode" minOccurs="0" maxOccurs="1" type="vsv:BatchActivationErrorCode">
+				<xs:annotation>
+					<xs:documentation>Optional: Only present if resultStatusCode indicates FAILURE</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="RedeemVoucherRequest">
+	<xs:annotation>
+		<xs:documentation>VOUCHER REDEMPTION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="vsvID" minOccurs="1" maxOccurs="1" type="vsv:VoucherServiceIdType"/>
+			<xs:element name="pin" minOccurs="1" maxOccurs="1">
+				<xs:simpleType>
+     				<xs:restriction base="xs:string">
+       				<xs:minLength value="1"/>
+     				</xs:restriction>
+  				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:simpleType name="RedeemVoucherSpecificErrorCode">
+    <xs:restriction base="xs:string">
+		<xs:enumeration value="302">
+			<xs:annotation>
+				<xs:documentation>VOUCHER NOT ACTIVE OVERRIDE USED</xs:documentation>
+			</xs:annotation>
+		</xs:enumeration>
+		<xs:enumeration value="303">
+			<xs:annotation>
+				<xs:documentation>VOUCHER PIN LENGTH INCORRECT</xs:documentation>
+			</xs:annotation>
+		</xs:enumeration>
+		<xs:enumeration value="304">
+			<xs:annotation>
+				<xs:documentation>VOUCHER EXPIRED</xs:documentation>
+			</xs:annotation>
+		</xs:enumeration>
+		<xs:enumeration value="306">
+			<xs:annotation>
+				<xs:documentation>VOUCHER BATCH NOT ACTIVE</xs:documentation>
+			</xs:annotation>
+		</xs:enumeration>
+		<xs:enumeration value="307">
+			<xs:annotation>
+				<xs:documentation>VOUCHER BATCH EXPIRED</xs:documentation>
+			</xs:annotation>
+		</xs:enumeration>
+		<xs:enumeration value="308">
+			<xs:annotation>
+				<xs:documentation>VOUCHER HAS ALREADY BEEN REDEEMED</xs:documentation>
+			</xs:annotation>
+		</xs:enumeration>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="RedeemVoucherErrorCode">
+    <xs:union memberTypes="vsv:VoucherReferenceErrorCode vsv:RedeemVoucherSpecificErrorCode"/>
+</xs:simpleType>
+
+<xs:element name="RedeemVoucherResponse">
+	<xs:annotation>
+		<xs:documentation>VOUCHER REDEMPTION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="resultStatusCode" minOccurs="1" maxOccurs="1" type="vsv:ResultStatusCode"/>
+			<xs:element name="redeemVoucherErrorCode" minOccurs="0" maxOccurs="1" type="vsv:RedeemVoucherErrorCode">
+				<xs:annotation>
+					<xs:documentation>Optional: Only present if resultStatusCode indicates FAILURE</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="DeactivateVoucherBatchRequest">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH DEACTIVATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="vsvID" minOccurs="1" maxOccurs="1" type="vsv:VoucherServiceIdType"/>
+			<xs:element name="batchNumber" minOccurs="1" maxOccurs="1" type="xs:positiveInteger"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+<xs:element name="DeactivateVoucherBatchResponse">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH DEACTIVATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="batchNumber" minOccurs="1" maxOccurs="1" type="xs:positiveInteger"/>
+			<xs:element name="resultStatusCode" minOccurs="1" maxOccurs="1" type="vsv:ResultStatusCode"/>
+			<xs:element name="errorCode" minOccurs="0" maxOccurs="1" type="vsv:BatchActivationErrorCode">
+				<xs:annotation>
+					<xs:documentation>Optional: Only present if resultStatusCode indicates FAILURE</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name="ActivateVoucherSerialRangeRequest">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH SERIAL RANGE ACTIVATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="vsvID" minOccurs="1" maxOccurs="1" type="vsv:VoucherServiceIdType"/>
+			<xs:element name="startSerialNumber" minOccurs="1" maxOccurs="1" type="vsv:SerialNumberType"/>
+			<xs:element name="endSerialNumber" minOccurs="1" maxOccurs="1" type="vsv:SerialNumberType"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:simpleType name="ActivateVoucherSerialRangeSpecificErrorCode">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="500">
+        	<xs:annotation>
+        		<xs:documentation>START END SERIAL RANGE VALIDATION ERROR</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="501">
+        	<xs:annotation>
+        		<xs:documentation>SERIAL RANGE PORTION DOES NOT EXIST</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="502">
+        	<xs:annotation>
+        		<xs:documentation>SERIAL RANGE PORTION ALREADY ACTIVE</xs:documentation>
+        	</xs:annotation>
+        </xs:enumeration>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="ActivateVoucherSerialRangeErrorCode">
+    <xs:union memberTypes="vsv:ErrorCode vsv:ActivateVoucherSerialRangeSpecificErrorCode"/>
+</xs:simpleType>
+
+<xs:element name="ActivateVoucherSerialRangeResponse">
+	<xs:annotation>
+		<xs:documentation>VOUCHER BATCH SERIAL RANGE ACTIVATION</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="resultStatusCode" minOccurs="1" maxOccurs="1" type="vsv:ResultStatusCode"/>
+			<xs:element name="startSerialNumber" minOccurs="1" maxOccurs="1" type="vsv:SerialNumberType"/>
+			<xs:element name="endSerialNumber" minOccurs="1" maxOccurs="1" type="vsv:SerialNumberType"/>
+			<xs:element name="errorCode" minOccurs="0" maxOccurs="1" type="vsv:ActivateVoucherSerialRangeErrorCode">
+				<xs:annotation>
+					<xs:documentation>Optional: Only present if resultStatusCode indicates FAILURE</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+</xs:schema>        

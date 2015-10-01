@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+ <!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+ 
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+	<New id="vouchserv" class="org.eclipse.jetty.plus.jndi.Resource">
+    	<Arg></Arg>
+    	<!-- jdbc/vouchserv is depended upon in the vouchserv module's spring-context.xml -->
+    	<Arg>jdbc/vouchserv</Arg>
+    	<Arg>
+     		<New class="org.postgresql.ds.PGSimpleDataSource">
+                 <Set name="User">vouchservtest</Set>
+                 <Set name="Password">vouchservtest</Set>
+                 <Set name="DatabaseName">vouchservtest</Set>
+                 <Set name="ServerName">localhost</Set>
+                 <Set name="PortNumber">5432</Set>
+     		</New>
+    	</Arg>
+	</New>
+</Configure>

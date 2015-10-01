@@ -1,0 +1,15 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+             version="1.0">
+    <persistence-unit name="vouchServ-pu" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+		<class>com.mayloom.vouchserv.dbo.User</class>
+		<class>com.mayloom.vouchserv.dbo.Role</class>
+        <class>com.mayloom.vouchserv.dbo.Voucher</class>
+        <class>com.mayloom.vouchserv.dbo.VoucherBatch</class>
+        <class>com.mayloom.vouchserv.dbo.VoucherBatchOwner</class>        
+       
+    </persistence-unit>
+</persistence>

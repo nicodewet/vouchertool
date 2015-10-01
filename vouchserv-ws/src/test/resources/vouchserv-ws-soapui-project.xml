@@ -1,0 +1,1210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="Test vouchserv-ws" soapui-version="4.5.1" abortOnError="false" runType="SEQUENTIAL" resourceRoot="" xmlns:con="http://eviware.com/soapui/config"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.actions.iface.tools.soapui.TestRunnerAction@values-local"><![CDATA[<xml-fragment xmlns:con="http://eviware.com/soapui/config">
+  <con:entry key="Environment" value="Default"/>
+  <con:entry key="Global Properties" value=""/>
+  <con:entry key="TestSuite" value="VoucherServiceSoap TestSuite"/>
+  <con:entry key="Report to Generate" value=""/>
+  <con:entry key="Password" value=""/>
+  <con:entry key="soapui-setings.xml Password" value=""/>
+  <con:entry key="TestRunner Path" value=""/>
+  <con:entry key="Tool Args" value=""/>
+  <con:entry key="Ignore Errors" value="false"/>
+  <con:entry key="Host:Port" value=""/>
+  <con:entry key="WSS Password Type" value=""/>
+  <con:entry key="Save Project" value="false"/>
+  <con:entry key="Enable UI" value="false"/>
+  <con:entry key="System Properties" value=""/>
+  <con:entry key="Domain" value=""/>
+  <con:entry key="Coverage Report" value="false"/>
+  <con:entry key="Export JUnit Results" value="false"/>
+  <con:entry key="Open Report" value="false"/>
+  <con:entry key="Project Properties" value=""/>
+  <con:entry key="Project Password" value=""/>
+  <con:entry key="Export All" value="false"/>
+  <con:entry key="Report Format(s)" value=""/>
+  <con:entry key="TestCase" value="GetVoucherBatchTestCase"/>
+  <con:entry key="Print Report" value="false"/>
+  <con:entry key="Username" value=""/>
+  <con:entry key="Root Folder" value="C:\Users\Nico\SOAP_UI"/>
+  <con:entry key="Save After" value="false"/>
+  <con:entry key="Add Settings" value="false"/>
+  <con:entry key="Endpoint" value=""/>
+</xml-fragment>]]></con:setting></con:settings><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="VoucherServiceSoap11" type="wsdl" bindingName="{http://vouchertool.com/vouchserv/definitions}VoucherServiceSoap11" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/vouchserv/vouchserv.wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/vouchserv/vouchserv.wsdl"><con:part><con:url>http://localhost:8080/vouchserv/vouchserv.wsdl</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="http://vouchertool.com/vouchserv/definitions" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://vouchertool.com/vouchserv/schemas" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://vouchertool.com/vouchserv/definitions">
+  <wsdl:types>
+    <xs:schema elementFormDefault="qualified" targetNamespace="http://vouchertool.com/vouchserv/schemas" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vsv="http://vouchertool.com/vouchserv/schemas">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">The VoucherTool (http://www.vouchertool.com) Voucher Service XSD. Copyright (c) by Nico Dirk de Wet 2012. All Rights Reserved.
+
+Author: Nico Dirk de Wet (http://www.nicodewet.com)
+
+The Voucher Service is a value-agnostic voucher management service specifically designed to be used in the Content Enricher Enterprise
+Integration Pattern. This generic, value-agnostic service serves as a highly re-usable component in a Service Oriented Architecture. 
+GetVoucherRequest and GetVoucherResponse are essential operation when it comes to the Voucher Service being used in the Content Enricher 
+Enterprise Integration Pattern as envisioned. GetVoucherResponse returns an element of type ContentEnricherVoucher (extends Voucher Type 
+to include a batchNumber element). This element is essential when using the Content Enricher Enterprise Integration  Pattern since the Voucher 
+Service is value agnostic (by design). In the event of voucher redemption, having validated the voucher, the batchNumber can be used to enrich 
+further, for example to determine the value (monetary or otherwise) of the VoucherBatch, in which case a separate data source (or service) may 
+be used for this purpose.</xs:documentation>
+      </xs:annotation>
+      <!--***************************************************-->
+      <!--**************    CORE TYPES     ******************-->
+      <!--***************************************************-->
+      <xs:complexType name="VoucherBatch">
+        <xs:all maxOccurs="1" minOccurs="1">
+          <xs:element name="voucherList">
+            <xs:complexType>
+              <xs:sequence maxOccurs="unbounded" minOccurs="1">
+                <xs:element name="voucher" type="vsv:Voucher"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="batchNumber" type="xs:positiveInteger"/>
+          <xs:element name="expiryDate" nillable="true" type="xs:dateTime"/>
+          <xs:element name="active" type="xs:boolean"/>
+          <xs:element name="creationDate" type="xs:dateTime"/>
+        </xs:all>
+      </xs:complexType>
+      <xs:complexType name="Voucher">
+        <xs:sequence>
+          <xs:element name="pin" type="xs:string"/>
+          <xs:element name="serialNumber" type="xs:long"/>
+          <xs:element name="expiryDate" nillable="true" type="xs:dateTime"/>
+          <xs:element name="active" type="xs:boolean"/>
+          <xs:element name="redemptionDate" nillable="true" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ContentEnricherVoucher">
+        <xs:complexContent>
+          <xs:extension base="vsv:Voucher">
+            <xs:sequence>
+              <xs:element name="batchNumber" type="xs:positiveInteger"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <!--Result status code common to all API Response elements-->
+      <xs:simpleType name="ResultStatusCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="0"/>
+          <!--SUCCESS-->
+          <xs:enumeration value="1"/>
+          <!--FAIL-->
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="SerialNumberType">
+        <xs:restriction base="xs:positiveInteger">
+          <xs:minInclusive value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="ErrorCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="100"/>
+          <!--VSV-ID INVALID-->
+        </xs:restriction>
+      </xs:simpleType>
+      <!--**********************************************************************-->
+      <!--**************    API: Request / Response Pairs     ******************-->
+      <!--**********************************************************************-->
+      <!--** REGISTRATION **-->
+      <xs:simpleType name="VoucherServiceIdType">
+        <xs:restriction base="xs:string">
+          <xs:pattern value="VSV-ID[0-9]{17}"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="RegisterRequest">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="xs:anyType"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="RegisterResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="1" name="vsvID" type="vsv:VoucherServiceIdType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="resultStatusCode" type="vsv:ResultStatusCode"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!--** VOUCHER BATCH GENERATION **-->
+      <xs:simpleType name="VoucherBatchType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="REGULAR"/>
+          <!--Initial state: VoucherBatch inactive, Vouchers active-->
+          <xs:enumeration value="JUST_IN_TIME"/>
+          <!--Initial state: VoucherBatch active, Vouchers inactive-->
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="PinType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="NUMERIC"/>
+          <!--Pin composed entirely of digits ranging from 0 to 9.-->
+          <xs:enumeration value="ALPHANUMERIC_UPPER_CASE"/>
+          <!--Pin composed of upper case alphabetic characters A to Z and digits 0 to 9.-->
+          <xs:enumeration value="ALPHANUMERIC_MIXED_CASE"/>
+          <!--Pin composed of upper case and lower case alphabetic characters a to z and A to Z,
+	 															and digits 0 to 9.-->
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="VoucherBatchGenerationRequest">
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="vsvID" type="vsv:VoucherServiceIdType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="voucherNumber" type="xs:positiveInteger"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="batchType" type="vsv:VoucherBatchType"/>
+            <!--Optional parameters - initialised to default values-->
+            <xs:element maxOccurs="1" minOccurs="0" name="pinLength">
+              <xs:simpleType>
+                <xs:restriction base="xs:integer">
+                  <xs:minInclusive value="6"/>
+                  <xs:maxInclusive value="30"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element maxOccurs="1" minOccurs="0" name="pinType" type="vsv:PinType"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="expiryDate" type="xs:dateTime"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherBatchGenerationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="1" name="batchNumber" type="xs:positiveInteger"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="resultStatusCode" type="vsv:ResultStatusCode"/>
+            <xs:element name="batchGenerationErrorList">
+              <xs:complexType>
+                <xs:sequence maxOccurs="1" minOccurs="0">
+                  <!--Should be 4, to updated in future version-->
+                  <xs:element name="batchGenerationErrorCode" type="vsv:BatchGenerationErrorCode"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:simpleType name="BatchGenerationErrorCode">
+        <xs:union memberTypes="vsv:ErrorCode vsv:BatchGenerationSpecificErrorCode"/>
+      </xs:simpleType>
+      <xs:simpleType name="BatchGenerationSpecificErrorCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="200"/>
+          <!--BATCH SIZE LIMIT EXCEEDED, MAX 1000-->
+          <xs:enumeration value="201"/>
+          <!--BATCH SIZE MUST BE GREATER THAN ZERO-->
+          <xs:enumeration value="202"/>
+          <!--BATCH EXPIRY DATE IN PAST-->
+          <xs:enumeration value="203"/>
+          <!--INVALID PIN LENGTH, MUST BE 6 TO 30-->
+        </xs:restriction>
+      </xs:simpleType>
+      <!--** VOUCHER BATCH FETCH **-->
+      <xs:element name="GetVoucherBatchRequest">
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="vsvID" type="vsv:VoucherServiceIdType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="batchNumber" type="xs:positiveInteger"/>
+            <!--TODO include voucherList only option and make said field optional-->
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GetVoucherBatchResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="voucherBatch" type="vsv:VoucherBatch"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!--** VOUCHER FETCH **-->
+      <xs:element name="GetVoucherRequest">
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="vsvID" type="vsv:VoucherServiceIdType"/>
+            <xs:choice>
+              <xs:element name="pin" type="xs:string"/>
+              <xs:element name="serialNumber" type="xs:long"/>
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:simpleType name="VoucherErrorCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="305"/>
+          <!--VOUCHER DOES NOT EXIST-->
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="VoucherReferenceErrorCode">
+        <xs:union memberTypes="vsv:ErrorCode vsv:VoucherErrorCode"/>
+      </xs:simpleType>
+      <xs:element name="GetVoucherResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <!--Optional: voucher only present if errorCode not present-->
+            <xs:element maxOccurs="1" minOccurs="0" name="voucher" type="vsv:ContentEnricherVoucher"/>
+            <!--Optional: errorCode only present if voucher not present-->
+            <xs:element maxOccurs="1" minOccurs="0" name="errorCode" type="vsv:VoucherReferenceErrorCode"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!--VOUCHER BATCH ACTIVATION-->
+      <xs:element name="ActivateVoucherBatchRequest">
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="vsvID" type="vsv:VoucherServiceIdType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="batchNumber" type="xs:positiveInteger"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:simpleType name="BatchActivationSpecificErrorCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="400"/>
+          <!--INVALID BATCH NUMBER-->
+          <xs:enumeration value="401"/>
+          <!--BATCH DOES NOT EXIST-->
+          <xs:enumeration value="402"/>
+          <!--BATCH ALREADY ACTIVE-->
+          <xs:enumeration value="403"/>
+          <!--BATCH ALREADY INACTIVE-->
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="BatchActivationErrorCode">
+        <xs:union memberTypes="vsv:ErrorCode vsv:BatchActivationSpecificErrorCode"/>
+      </xs:simpleType>
+      <xs:element name="ActivateVoucherBatchResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="batchNumber" type="xs:positiveInteger"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="resultStatusCode" type="vsv:ResultStatusCode"/>
+            <!--Optional: Only present if resultStatusCode indicates FAILURE-->
+            <xs:element maxOccurs="1" minOccurs="0" name="errorCode" type="vsv:BatchActivationErrorCode"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!--VOUCHER REDEMPTION-->
+      <xs:element name="RedeemVoucherRequest">
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="vsvID" type="vsv:VoucherServiceIdType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="pin">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:minLength value="1"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:simpleType name="RedeemVoucherSpecificErrorCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="302"/>
+          <!--VOUCHER NOT ACTIVE OVERRIDE USED-->
+          <xs:enumeration value="303"/>
+          <!--VOUCHER PIN LENGTH INCORRECT-->
+          <xs:enumeration value="304"/>
+          <!--VOUCHER EXPIRED-->
+          <xs:enumeration value="306"/>
+          <!--VOUCHER BATCH NOT ACTIVE-->
+          <xs:enumeration value="307"/>
+          <!--VOUCHER BATCH EXPIRED-->
+          <xs:enumeration value="308"/>
+          <!--VOUCHER HAS ALREADY BEEN REDEEMED-->
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="RedeemVoucherErrorCode">
+        <xs:union memberTypes="vsv:VoucherReferenceErrorCode vsv:RedeemVoucherSpecificErrorCode"/>
+      </xs:simpleType>
+      <xs:element name="RedeemVoucherResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="1" name="resultStatusCode" type="vsv:ResultStatusCode"/>
+            <!--Optional: Only present if resultStatusCode indicates FAILURE-->
+            <xs:element maxOccurs="1" minOccurs="0" name="redeemVoucherErrorCode" type="vsv:RedeemVoucherErrorCode"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!--VOUCHER BATCH DEACTIVATION-->
+      <xs:element name="DeactivateVoucherBatchRequest">
+        <!--TODO repetitive, identical to ActivateVoucherBatchRequest-->
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="vsvID" type="vsv:VoucherServiceIdType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="batchNumber" type="xs:positiveInteger"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="DeactivateVoucherBatchResponse">
+        <!--TODO repetitive, identical to ActivateVoucherBatchResponse-->
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="batchNumber" type="xs:positiveInteger"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="resultStatusCode" type="vsv:ResultStatusCode"/>
+            <!--Optional: Only present if resultStatusCode indicates FAILURE-->
+            <xs:element maxOccurs="1" minOccurs="0" name="errorCode" type="vsv:BatchActivationErrorCode"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!--VOUCHER BATCH SERIAL RANGE ACTIVATION-->
+      <xs:element name="ActivateVoucherSerialRangeRequest">
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="vsvID" type="vsv:VoucherServiceIdType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="startSerialNumber" type="vsv:SerialNumberType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="endSerialNumber" type="vsv:SerialNumberType"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:simpleType name="ActivateVoucherSerialRangeSpecificErrorCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="500"/>
+          <!--START END SERIAL RANGE VALIDATION ERROR-->
+          <xs:enumeration value="501"/>
+          <!--SERIAL RANGE PORTION DOES NOT EXIST-->
+          <xs:enumeration value="502"/>
+          <!--SERIAL RANGE PORTION ALREADY ACTIVE-->
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="ActivateVoucherSerialRangeErrorCode">
+        <xs:union memberTypes="vsv:ErrorCode vsv:ActivateVoucherSerialRangeSpecificErrorCode"/>
+      </xs:simpleType>
+      <xs:element name="ActivateVoucherSerialRangeResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <!--Required parameters-->
+            <xs:element maxOccurs="1" minOccurs="1" name="resultStatusCode" type="vsv:ResultStatusCode"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="startSerialNumber" type="vsv:SerialNumberType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="endSerialNumber" type="vsv:SerialNumberType"/>
+            <!--Optional: Only present if resultStatusCode indicates FAILURE-->
+            <xs:element maxOccurs="1" minOccurs="0" name="errorCode" type="vsv:ActivateVoucherSerialRangeErrorCode"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="RedeemVoucherRequest">
+    <wsdl:part element="sch:RedeemVoucherRequest" name="RedeemVoucherRequest"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="VoucherBatchGenerationRequest">
+    <wsdl:part element="sch:VoucherBatchGenerationRequest" name="VoucherBatchGenerationRequest"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="RedeemVoucherResponse">
+    <wsdl:part element="sch:RedeemVoucherResponse" name="RedeemVoucherResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ActivateVoucherSerialRangeRequest">
+    <wsdl:part element="sch:ActivateVoucherSerialRangeRequest" name="ActivateVoucherSerialRangeRequest"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeactivateVoucherBatchRequest">
+    <wsdl:part element="sch:DeactivateVoucherBatchRequest" name="DeactivateVoucherBatchRequest"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ActivateVoucherSerialRangeResponse">
+    <wsdl:part element="sch:ActivateVoucherSerialRangeResponse" name="ActivateVoucherSerialRangeResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVoucherRequest">
+    <wsdl:part element="sch:GetVoucherRequest" name="GetVoucherRequest"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ActivateVoucherBatchRequest">
+    <wsdl:part element="sch:ActivateVoucherBatchRequest" name="ActivateVoucherBatchRequest"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="RegisterResponse">
+    <wsdl:part element="sch:RegisterResponse" name="RegisterResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVoucherBatchResponse">
+    <wsdl:part element="sch:GetVoucherBatchResponse" name="GetVoucherBatchResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="RegisterRequest">
+    <wsdl:part element="sch:RegisterRequest" name="RegisterRequest"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="VoucherBatchGenerationResponse">
+    <wsdl:part element="sch:VoucherBatchGenerationResponse" name="VoucherBatchGenerationResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeactivateVoucherBatchResponse">
+    <wsdl:part element="sch:DeactivateVoucherBatchResponse" name="DeactivateVoucherBatchResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVoucherBatchRequest">
+    <wsdl:part element="sch:GetVoucherBatchRequest" name="GetVoucherBatchRequest"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ActivateVoucherBatchResponse">
+    <wsdl:part element="sch:ActivateVoucherBatchResponse" name="ActivateVoucherBatchResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVoucherResponse">
+    <wsdl:part element="sch:GetVoucherResponse" name="GetVoucherResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="VoucherService">
+    <wsdl:operation name="RedeemVoucher">
+      <wsdl:input message="tns:RedeemVoucherRequest" name="RedeemVoucherRequest"></wsdl:input>
+      <wsdl:output message="tns:RedeemVoucherResponse" name="RedeemVoucherResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="VoucherBatchGeneration">
+      <wsdl:input message="tns:VoucherBatchGenerationRequest" name="VoucherBatchGenerationRequest"></wsdl:input>
+      <wsdl:output message="tns:VoucherBatchGenerationResponse" name="VoucherBatchGenerationResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ActivateVoucherSerialRange">
+      <wsdl:input message="tns:ActivateVoucherSerialRangeRequest" name="ActivateVoucherSerialRangeRequest"></wsdl:input>
+      <wsdl:output message="tns:ActivateVoucherSerialRangeResponse" name="ActivateVoucherSerialRangeResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeactivateVoucherBatch">
+      <wsdl:input message="tns:DeactivateVoucherBatchRequest" name="DeactivateVoucherBatchRequest"></wsdl:input>
+      <wsdl:output message="tns:DeactivateVoucherBatchResponse" name="DeactivateVoucherBatchResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVoucher">
+      <wsdl:input message="tns:GetVoucherRequest" name="GetVoucherRequest"></wsdl:input>
+      <wsdl:output message="tns:GetVoucherResponse" name="GetVoucherResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ActivateVoucherBatch">
+      <wsdl:input message="tns:ActivateVoucherBatchRequest" name="ActivateVoucherBatchRequest"></wsdl:input>
+      <wsdl:output message="tns:ActivateVoucherBatchResponse" name="ActivateVoucherBatchResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Register">
+      <wsdl:input message="tns:RegisterRequest" name="RegisterRequest"></wsdl:input>
+      <wsdl:output message="tns:RegisterResponse" name="RegisterResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVoucherBatch">
+      <wsdl:input message="tns:GetVoucherBatchRequest" name="GetVoucherBatchRequest"></wsdl:input>
+      <wsdl:output message="tns:GetVoucherBatchResponse" name="GetVoucherBatchResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="VoucherServiceSoap11" type="tns:VoucherService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="RedeemVoucher">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="RedeemVoucherRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="RedeemVoucherResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="VoucherBatchGeneration">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="VoucherBatchGenerationRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="VoucherBatchGenerationResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ActivateVoucherSerialRange">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="ActivateVoucherSerialRangeRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ActivateVoucherSerialRangeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeactivateVoucherBatch">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="DeactivateVoucherBatchRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="DeactivateVoucherBatchResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVoucher">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="GetVoucherRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetVoucherResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ActivateVoucherBatch">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="ActivateVoucherBatchRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ActivateVoucherBatchResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Register">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="RegisterRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="RegisterResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVoucherBatch">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="GetVoucherBatchRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetVoucherBatchResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="VoucherServiceService">
+    <wsdl:port binding="tns:VoucherServiceSoap11" name="VoucherServiceSoap11">
+      <soap:address location="http://localhost:8080/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:endpoint>http://localhost:8083/</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="GetVoucherBatch" bindingOperationName="GetVoucherBatch" type="Request-Response" outputName="GetVoucherBatchResponse" inputName="GetVoucherBatchRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sch:GetVoucherBatchRequest>
+         <sch:vsvID>?</sch:vsvID>
+         <sch:batchNumber>?</sch:batchNumber>
+      </sch:GetVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://vouchertool.com/vouchserv/definitions/VoucherService/GetVoucherBatchRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation isOneWay="false" action="" name="Register" bindingOperationName="Register" type="Request-Response" outputName="RegisterResponse" inputName="RegisterRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sch:RegisterRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://vouchertool.com/vouchserv/definitions/VoucherService/RegisterRequest"/></con:call></con:operation><con:operation isOneWay="false" action="" name="VoucherBatchGeneration" bindingOperationName="VoucherBatchGeneration" type="Request-Response" outputName="VoucherBatchGenerationResponse" inputName="VoucherBatchGenerationRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sch:VoucherBatchGenerationRequest>
+         <sch:vsvID>?</sch:vsvID>
+         <sch:voucherNumber>?</sch:voucherNumber>
+         <sch:batchType>?</sch:batchType>
+         <!--Optional:-->
+         <sch:pinLength>?</sch:pinLength>
+         <!--Optional:-->
+         <sch:pinType>?</sch:pinType>
+         <!--Optional:-->
+         <sch:expiryDate>?</sch:expiryDate>
+      </sch:VoucherBatchGenerationRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://vouchertool.com/vouchserv/definitions/VoucherService/VoucherBatchGenerationRequest"/></con:call></con:operation><con:operation isOneWay="false" action="" name="RedeemVoucher" bindingOperationName="RedeemVoucher" type="Request-Response" outputName="RedeemVoucherResponse" inputName="RedeemVoucherRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sch:RedeemVoucherRequest>
+         <sch:vsvID>?</sch:vsvID>
+         <sch:pin>?</sch:pin>
+      </sch:RedeemVoucherRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://vouchertool.com/vouchserv/definitions/VoucherService/RedeemVoucherRequest"/></con:call></con:operation><con:operation isOneWay="false" action="" name="ActivateVoucherBatch" bindingOperationName="ActivateVoucherBatch" type="Request-Response" outputName="ActivateVoucherBatchResponse" inputName="ActivateVoucherBatchRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sch:ActivateVoucherBatchRequest>
+         <sch:vsvID>?</sch:vsvID>
+         <sch:batchNumber>?</sch:batchNumber>
+      </sch:ActivateVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://vouchertool.com/vouchserv/definitions/VoucherService/ActivateVoucherBatchRequest"/></con:call></con:operation><con:operation isOneWay="false" action="" name="DeactivateVoucherBatch" bindingOperationName="DeactivateVoucherBatch" type="Request-Response" outputName="DeactivateVoucherBatchResponse" inputName="DeactivateVoucherBatchRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sch:DeactivateVoucherBatchRequest>
+         <sch:vsvID>?</sch:vsvID>
+         <sch:batchNumber>?</sch:batchNumber>
+      </sch:DeactivateVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://vouchertool.com/vouchserv/definitions/VoucherService/DeactivateVoucherBatchRequest"/></con:call></con:operation><con:operation isOneWay="false" action="" name="ActivateVoucherSerialRange" bindingOperationName="ActivateVoucherSerialRange" type="Request-Response" outputName="ActivateVoucherSerialRangeResponse" inputName="ActivateVoucherSerialRangeRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sch:ActivateVoucherSerialRangeRequest>
+         <sch:vsvID>?</sch:vsvID>
+         <sch:startSerialNumber>?</sch:startSerialNumber>
+         <sch:endSerialNumber>?</sch:endSerialNumber>
+      </sch:ActivateVoucherSerialRangeRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://vouchertool.com/vouchserv/definitions/VoucherService/ActivateVoucherSerialRangeRequest"/></con:call></con:operation><con:operation isOneWay="false" action="" name="GetVoucher" bindingOperationName="GetVoucher" type="Request-Response" outputName="GetVoucherResponse" inputName="GetVoucherRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sch:GetVoucherRequest>
+         <sch:vsvID>?</sch:vsvID>
+         <!--You have a CHOICE of the next 2 items at this level-->
+         <sch:pin>?</sch:pin>
+         <sch:serialNumber>?</sch:serialNumber>
+      </sch:GetVoucherRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://vouchertool.com/vouchserv/definitions/VoucherService/GetVoucherRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:testSuite name="VoucherServiceSoap TestSuite"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="SimpleRegisterTest_Positive" searchProperties="true" id="a8052307-75cd-43e5-a4a4-54c8e78b61b7"><con:description>Simple Registration Test Case</con:description><con:settings/><con:testStep type="request" name="Register"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>Register</con:operation><con:request name="Register"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:sch="http://vouchertool.com/vouchserv/schemas" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RegisterRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Fault Assertion" name="Not SOAP Fault"/><con:assertion type="Schema Compliance" name="Schema Compliance"><con:configuration><definition/></con:configuration></con:assertion><con:assertion type="SOAP Response" name="SOAP Response"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RegisterResponse/ns2:resultStatusCode</path><content>0</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig action="http://vouchertool.com/vouchserv/definitions/VoucherService/RegisterRequest" mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="RandomDeactivateVoucherBatchRequest_Negative" searchProperties="true" id="d82275ae-3648-4366-98ed-557b717ad681"><con:settings/><con:testStep type="request" name="DeactivateVoucherBatchRequest_Random"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>DeactivateVoucherBatch</con:operation><con:request name="DeactivateVoucherBatchRequest_Random"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:DeactivateVoucherBatchRequest>
+         <sch:vsvID>VSV-ID12345678901234567</sch:vsvID>
+         <sch:batchNumber>100</sch:batchNumber>
+      </sch:DeactivateVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:DeactivateVoucherBatchResponse/ns2:errorCode</path><content>100</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="resultStatusCode"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:DeactivateVoucherBatchResponse/ns2:resultStatusCode</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="batchNumber"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:DeactivateVoucherBatchResponse/ns2:batchNumber</path><content>100</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="JustInTimeVoucherBatchTest_Positive_Generation" searchProperties="true" id="a1461e57-e564-4178-a5ac-7fd62422be21"><con:settings/><con:testStep type="request" name="Register"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>Register</con:operation><con:request name="Register"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RegisterRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="transfer" name="TransferID"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="false" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>vsvID</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Register</con:sourceStep><con:sourcePath>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RegisterResponse/ns2:vsvID
+</con:sourcePath><con:targetType>Request</con:targetType><con:targetStep>VoucherBatchGenerationRequest</con:targetStep><con:targetPath>declare namespace sch='http://vouchertool.com/vouchserv/schemas';
+//sch:vsvID</con:targetPath></con:transfers></con:config></con:testStep><con:testStep type="request" name="VoucherBatchGenerationRequest"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>VoucherBatchGeneration</con:operation><con:request name="VoucherBatchGenerationRequest"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:VoucherBatchGenerationRequest>
+         <sch:vsvID>VSV-ID20120812100806519</sch:vsvID>
+         <sch:voucherNumber>50</sch:voucherNumber>
+         <sch:batchType>JUST_IN_TIME</sch:batchType>
+         <sch:pinType>ALPHANUMERIC_UPPER_CASE</sch:pinType>
+      </sch:VoucherBatchGenerationRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="RegularVoucherBatchTest_Positive_Redemption" searchProperties="true" id="c901a28f-6ccb-466e-880b-79543113090e"><con:settings/><con:testStep type="request" name="Register"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>Register</con:operation><con:request name="Register"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RegisterRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token/><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="properties" name="Properties"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>vsvID</con:name><con:value>VSV-ID20120812614327816</con:value></con:property><con:property><con:name>batchNumber</con:name><con:value>1</con:value></con:property><con:property><con:name>pin</con:name><con:value>596469190755</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="transfer" name="Transfer vsvID"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="false" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>vsvID</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Register</con:sourceStep><con:sourcePath>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RegisterResponse/ns2:vsvID
+</con:sourcePath><con:targetType>vsvID</con:targetType><con:targetStep>Properties</con:targetStep><con:targetPath/></con:transfers></con:config></con:testStep><con:testStep type="request" name="VoucherBatchGenerationRequest"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>VoucherBatchGeneration</con:operation><con:request name="VoucherBatchGenerationRequest"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:VoucherBatchGenerationRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:voucherNumber>50</sch:voucherNumber>
+         <sch:batchType>REGULAR</sch:batchType>
+      </sch:VoucherBatchGenerationRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="transfer" name="Transfer batchNumber"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>batchNumber</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>VoucherBatchGenerationRequest</con:sourceStep><con:sourcePath>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:VoucherBatchGenerationResponse/ns2:batchNumber</con:sourcePath><con:targetType>batchNumber</con:targetType><con:targetStep>Properties</con:targetStep></con:transfers></con:config></con:testStep><con:testStep type="request" name="GetVoucherBatchRequest"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>GetVoucherBatch</con:operation><con:request name="GetVoucherBatchRequest"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:GetVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>${#batchNumber}</sch:batchNumber>
+      </sch:GetVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>//*[local-name()='GetVoucherBatchResponse']/*[local-name()='voucherBatch']/*[local-name()='active']</path><content>false</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="transfer" name="Transfer pin"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>Transfer pin</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>GetVoucherBatchRequest</con:sourceStep><con:sourcePath>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:GetVoucherBatchResponse/ns2:voucherBatch/ns2:voucherList/ns2:voucher[1]/ns2:pin</con:sourcePath><con:targetType>pin</con:targetType><con:targetStep>Properties</con:targetStep></con:transfers></con:config></con:testStep><con:testStep type="request" name="ActivateVoucherBatchRequest"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>ActivateVoucherBatch</con:operation><con:request name="ActivateVoucherBatchRequest"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:ActivateVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>${#batchNumber}</sch:batchNumber>
+      </sch:ActivateVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="GetVoucherBatch_PresumedActivated"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>GetVoucherBatch</con:operation><con:request name="GetVoucherBatch_PresumedActivated"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:GetVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>${#batchNumber}</sch:batchNumber>
+      </sch:GetVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>//*[local-name()='GetVoucherBatchResponse']/*[local-name()='voucherBatch']/*[local-name()='active']</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="RedeemVoucherRequest"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>RedeemVoucher</con:operation><con:request name="RedeemVoucherRequest"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RedeemVoucherRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:pin>${#pin}</sch:pin>
+      </sch:RedeemVoucherRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="checkRedeemedVoucherIsNoLongerActive"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>GetVoucherBatch</con:operation><con:request name="checkRedeemedVoucherIsNoLongerActive"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:GetVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>${#batchNumber}</sch:batchNumber>
+      </sch:GetVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>//*[local-name()='GetVoucherBatchResponse']/*[local-name()='voucherBatch']/*[local-name()='voucherList']/*[local-name()='voucher'][1]/*[local-name()='active']</path><content>false</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="RegularVoucherBatchTest_Negative_Redemption" searchProperties="true" id="c69f7522-576b-404f-9e02-cbdf6440578d"><con:description>Register, generate a REGULAR VoucherBatch, attempt to redeem a Voucher (failure expected), activate the VoucherBatch, attempt to redeem the same Voucher (success expected), 
+then attempt to redeem the same Voucher again (failure expected). </con:description><con:settings/><con:testStep type="request" name="Register"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>Register</con:operation><con:request name="Register"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RegisterRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="transfer" name="Property vsvID"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>vsvID</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Register</con:sourceStep><con:sourcePath>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RegisterResponse/ns2:vsvID</con:sourcePath><con:targetType>vsvID</con:targetType><con:targetStep>Properties</con:targetStep></con:transfers></con:config></con:testStep><con:testStep type="properties" name="Properties"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>vsvID</con:name><con:value>VSV-ID20120812814953929</con:value></con:property><con:property><con:name>pin</con:name><con:value>Qo9utpM09UsM9KrWFoUfg0t181Gp39</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="request" name="GenerateREGULARVoucherBatch"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>VoucherBatchGeneration</con:operation><con:request name="GenerateREGULARVoucherBatch"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:VoucherBatchGenerationRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:voucherNumber>5</sch:voucherNumber>
+         <sch:batchType>REGULAR</sch:batchType>
+         <!--Optional:-->
+         <sch:pinLength>30</sch:pinLength>
+         <!--Optional:-->
+         <sch:pinType>ALPHANUMERIC_MIXED_CASE</sch:pinType>
+         <!--Optional:-->
+         <sch:expiryDate>2052-05-30T09:30:10Z</sch:expiryDate>
+      </sch:VoucherBatchGenerationRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:VoucherBatchGenerationResponse/ns2:batchNumber</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match"><con:configuration/></con:assertion><con:assertion type="XPath Match" name="Check resultStatusCode"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:VoucherBatchGenerationResponse/ns2:resultStatusCode</path><content>0</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="GetInactiveVoucherBatch"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>GetVoucherBatch</con:operation><con:request name="GetInactiveVoucherBatch"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:GetVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>1</sch:batchNumber>
+      </sch:GetVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="transfer" name="Transfer pin"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>Transfer pin</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>GetInactiveVoucherBatch</con:sourceStep><con:sourcePath>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:GetVoucherBatchResponse/ns2:voucherBatch/ns2:voucherList/ns2:voucher[1]/ns2:pin</con:sourcePath><con:targetType>pin</con:targetType><con:targetStep>Properties</con:targetStep></con:transfers></con:config></con:testStep><con:testStep type="request" name="RedeemExistingVoucherAttempt"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>RedeemVoucher</con:operation><con:request name="RedeemExistingVoucherAttempt"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RedeemVoucherRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:pin>${#pin}</sch:pin>
+      </sch:RedeemVoucherRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RedeemVoucherResponse/ns2:resultStatusCode</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="Check redeemVoucherErrorCode"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RedeemVoucherResponse/ns2:redeemVoucherErrorCode</path><content>306</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="RedeemNonExistingVoucherAttempt"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>RedeemVoucher</con:operation><con:request name="RedeemNonExistingVoucherAttempt"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RedeemVoucherRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:pin>123456</sch:pin>
+      </sch:RedeemVoucherRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RedeemVoucherResponse/ns2:resultStatusCode</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="Check redeemVoucherErrorCode"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RedeemVoucherResponse/ns2:redeemVoucherErrorCode</path><content>305</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="ActivateNonExistingVoucherBatchAttempt"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>ActivateVoucherBatch</con:operation><con:request name="ActivateNonExistingVoucherBatchAttempt"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:ActivateVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>101</sch:batchNumber>
+      </sch:ActivateVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:ActivateVoucherBatchResponse/ns2:resultStatusCode</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="batch does not exist error"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:ActivateVoucherBatchResponse/ns2:errorCode</path><content>401</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="check batch number"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:ActivateVoucherBatchResponse/ns2:batchNumber</path><content>101</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="ActivateVoucherBatch"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>ActivateVoucherBatch</con:operation><con:request name="ActivateVoucherBatch"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:ActivateVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>1</sch:batchNumber>
+      </sch:ActivateVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:ActivateVoucherBatchResponse/ns2:resultStatusCode</path><content>0</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="check batch number"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:ActivateVoucherBatchResponse/ns2:batchNumber</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="RedeemVoucher_PositiveTest"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>RedeemVoucher</con:operation><con:request name="RedeemVoucher_PositiveTest"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RedeemVoucherRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:pin>${#pin}</sch:pin>
+      </sch:RedeemVoucherRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RedeemVoucherResponse/ns2:resultStatusCode</path><content>0</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="RedeemVoucherAgain_NegativeTest"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>RedeemVoucher</con:operation><con:request name="RedeemVoucherAgain_NegativeTest"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RedeemVoucherRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:pin>${#pin}</sch:pin>
+      </sch:RedeemVoucherRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RedeemVoucherResponse/ns2:resultStatusCode</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="Check redeemVoucherErrorCode"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RedeemVoucherResponse/ns2:redeemVoucherErrorCode</path><content>308</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="Deactivate_VoucherBatch_Positive"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>DeactivateVoucherBatch</con:operation><con:request name="Deactivate_VoucherBatch_Positive"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:DeactivateVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>1</sch:batchNumber>
+      </sch:DeactivateVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:DeactivateVoucherBatchResponse/ns2:batchNumber</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="checkResultStatusCode"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:DeactivateVoucherBatchResponse/ns2:resultStatusCode</path><content>0</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="Deactivate_VoucherBatch_Negative"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>DeactivateVoucherBatch</con:operation><con:request name="Deactivate_VoucherBatch_Negative"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:DeactivateVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>1</sch:batchNumber>
+      </sch:DeactivateVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:DeactivateVoucherBatchResponse/ns2:errorCode</path><content>403</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="resultStatusCode"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:DeactivateVoucherBatchResponse/ns2:resultStatusCode</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="ActivateVoucherSerialRange_Positive" searchProperties="true" id="64f996c9-e9d0-496b-93f3-c2c5e8ac362d"><con:settings/><con:testStep type="request" name="Register"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>Register</con:operation><con:request name="Register"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RegisterRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="transfer" name="Transfer vsvID"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>vsvID</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Register</con:sourceStep><con:sourcePath>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RegisterResponse/ns2:vsvID</con:sourcePath><con:targetType>vsvID</con:targetType><con:targetStep>Properties</con:targetStep></con:transfers></con:config></con:testStep><con:testStep type="properties" name="Properties"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>vsvID</con:name><con:value>VSV-ID20120812369325629</con:value></con:property><con:property><con:name>startSerial</con:name><con:value/></con:property><con:property><con:name>endSerial</con:name><con:value/></con:property><con:property><con:name>batchSize</con:name><con:value>50</con:value></con:property><con:property><con:name>batchType</con:name><con:value>JUST_IN_TIME</con:value></con:property><con:property><con:name>pinLength</con:name><con:value>12</con:value></con:property><con:property><con:name>pinType</con:name><con:value>ALPHANUMERIC_UPPER_CASE</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="request" name="GenerateJUST_IN_TIMEVoucherBatch"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>VoucherBatchGeneration</con:operation><con:request name="GenerateJUST_IN_TIMEVoucherBatch"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:VoucherBatchGenerationRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:voucherNumber>${batchSize}</sch:voucherNumber>
+         <sch:batchType>${batchType}</sch:batchType>
+         <!--Optional:-->
+         <sch:pinLength>${pinLength}</sch:pinLength>
+         <!--Optional:-->
+         <sch:pinType>${pinType}</sch:pinType>
+         <!--Optional:-->
+         <sch:expiryDate>2052-05-30T09:30:10Z</sch:expiryDate>
+      </sch:VoucherBatchGenerationRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="ActivateHalfOfBatch"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>ActivateVoucherSerialRange</con:operation><con:request name="ActivateHalfOfBatch"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:ActivateVoucherSerialRangeRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:startSerialNumber>1</sch:startSerialNumber>
+         <sch:endSerialNumber>25</sch:endSerialNumber>
+      </sch:ActivateVoucherSerialRangeRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="GetVoucherBatch"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>GetVoucherBatch</con:operation><con:request name="GetVoucherBatch"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:GetVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>1</sch:batchNumber>
+      </sch:GetVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/schemas';
+//ns1:GetVoucherBatchResponse/ns1:voucherBatch/ns1:active</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="CheckVoucher25"><con:configuration><path>declare namespace SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/schemas';
+//ns1:GetVoucherBatchResponse/ns1:voucherBatch/ns1:voucherList/ns1:voucher[25]/ns1:active</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="CheckVoucherBatch26Inactive"><con:configuration><path>declare namespace SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/schemas';
+//ns1:GetVoucherBatchResponse/ns1:voucherBatch/ns1:voucherList/ns1:voucher[26]/ns1:active</path><content>false</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="GetVoucher_Positive" searchProperties="true" id="e51af835-a373-4ddd-b331-8805edb96923"><con:settings/><con:testStep type="request" name="Register"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>Register</con:operation><con:request name="Register"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:RegisterRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="transfer" name="TransferID"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="false" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>vsvID</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Register</con:sourceStep><con:sourcePath>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:RegisterResponse/ns2:vsvID
+</con:sourcePath><con:targetType>vsvID</con:targetType><con:targetStep>Properties</con:targetStep><con:targetPath/></con:transfers></con:config></con:testStep><con:testStep type="properties" name="Properties"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>vsvID</con:name><con:value>VSV-ID20121015472876649</con:value></con:property><con:property><con:name>voucherSerialNumber</con:name><con:value>1</con:value></con:property><con:property><con:name>firstVoucherPin</con:name><con:value>WJODMDWYNDII</con:value></con:property><con:property><con:name>batchNumber</con:name><con:value>1</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="request" name="VoucherBatchGenerationRequest"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>VoucherBatchGeneration</con:operation><con:request name="VoucherBatchGenerationRequest"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:VoucherBatchGenerationRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:voucherNumber>50</sch:voucherNumber>
+         <sch:batchType>JUST_IN_TIME</sch:batchType>
+         <sch:pinType>ALPHANUMERIC_UPPER_CASE</sch:pinType>
+      </sch:VoucherBatchGenerationRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:VoucherBatchGenerationResponse/ns2:batchNumber</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="GetFirstVoucherBySerialNumber"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>GetVoucher</con:operation><con:request name="GetFirstVoucherBySerialNumber"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:GetVoucherRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:serialNumber>${#voucherSerialNumber}</sch:serialNumber>
+      </sch:GetVoucherRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:assertion type="XPath Match" name="XPath Match"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:GetVoucherResponse/ns2:voucher/ns2:batchNumber</path><content>1</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" name="CheckVoucherInactive"><con:configuration><path>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:GetVoucherResponse/ns2:voucher/ns2:active</path><content>false</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="GetVoucherBatch"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>GetVoucherBatch</con:operation><con:request name="GetVoucherBatch"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:GetVoucherBatchRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:batchNumber>${#batchNumber}</sch:batchNumber>
+      </sch:GetVoucherBatchRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="transfer" name="Transfer first voucher pin"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>pin</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>GetVoucherBatch</con:sourceStep><con:sourcePath>declare namespace soap='http://schemas.xmlsoap.org/soap/envelope/';
+declare namespace ns1='http://vouchertool.com/vouchserv/definitions';
+declare namespace ns2='http://vouchertool.com/vouchserv/schemas';
+//soap:Envelope/soap:Body/ns2:GetVoucherBatchResponse/ns2:voucherBatch/ns2:voucherList/ns2:voucher[1]/ns2:pin</con:sourcePath><con:targetType>firstVoucherPin</con:targetType><con:targetStep>Properties</con:targetStep></con:transfers></con:config></con:testStep><con:testStep type="request" name="GetFirstVoucherByPin"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>GetVoucher</con:operation><con:request name="GetFirstVoucherByPin"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header>
+      <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+         <wsse:UsernameToken wsu:Id="UsernameToken-1">
+            <wsse:Username>${#Username}</wsse:Username>
+            <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${#Password}</wsse:Password>
+         </wsse:UsernameToken>
+      </wsse:Security>
+   </soapenv:Header>
+   <soapenv:Body>
+      <sch:GetVoucherRequest>
+         <sch:vsvID>${#vsvID}</sch:vsvID>
+         <sch:pin>${#firstVoucherPin}</sch:pin>
+      </sch:GetVoucherRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="GetVoucher_Negative" searchProperties="true"><con:settings/><con:testStep type="request" name="Register"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>VoucherServiceSoap11</con:interface><con:operation>Register</con:operation><con:request name="Register" outgoingWss="vouchserv-ws security conf"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/vouchserv-ws/voucherService/</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://vouchertool.com/vouchserv/schemas">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sch:RegisterRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Schema Compliance"><con:configuration/></con:assertion><con:assertion type="SOAP Fault Assertion"/><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties/><con:wssContainer><con:outgoing><con:name>vouchserv-ws security conf</con:name><con:username>nico@nicodewet.com</con:username><con:password>password</con:password><con:entry type="Username"><con:configuration><addCreated>false</addCreated><addNonce>false</addNonce><passwordType>PasswordText</passwordType></con:configuration></con:entry></con:outgoing></con:wssContainer><con:sensitiveInformation/></con:soapui-project>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+	<!-- http://grepcode.com/file/repo1.maven.org/maven2/net.sf.ehcache/ehcache-core/2.4.7/ehcache-failsafe.xml/ -->
+ 	<diskStore path="java.io.tmpdir"/>
+	<defaultCache
+            maxElementsInMemory="10000000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            memoryStoreEvictionPolicy="LRU"
+	/>
+	<cache name="com.mayloom.vouchserv.dbo.User"
+		maxElementsInMemory="10000" 
+		eternal="false"
+		timeToIdleSeconds="300"
+		timeToLiveSeconds="600"
+		overflowToDisk="false"/>
+	<cache name="com.mayloom.vouchserv.dbo.Role"
+		maxElementsInMemory="1000" 
+		eternal="false"
+		timeToIdleSeconds="300"
+		timeToLiveSeconds="600"
+		overflowToDisk="false"/>
+	<cache name="com.mayloom.vouchserv.dbo.VoucherBatchOwner"
+		maxElementsInMemory="10000" 
+		eternal="false"
+		timeToIdleSeconds="300"
+		timeToLiveSeconds="600"
+		overflowToDisk="false"/>
+	<cache name="com.mayloom.vouchserv.dbo.VoucherBatch"
+		maxElementsInMemory="100000"
+		eternal="false"
+		timeToIdleSeconds="300"
+		timeToLiveSeconds="600"
+		overflowToDisk="false"/>
+	<cache name="com.mayloom.vouchserv.dbo.Voucher"
+		maxElementsInMemory="1000000"
+		eternal="false"
+		timeToIdleSeconds="300"
+		timeToLiveSeconds="600"
+		overflowToDisk="false"/>	
+</ehcache>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.vouchertool</groupId>
+    <artifactId>vouchserv-api</artifactId>
+    <packaging>jar</packaging>
+    <version>0.08-SNAPSHOT</version>
+    
+    <name>VoucherTool API</name>
+    <description>VoucherTool Java API. VoucherTool: the multi-user voucher management SOAP Web service.</description>
+    <url>http://www.vouchertool.com</url>
+    
+    <distributionManagement>
+    	<repository>
+      		<id>mayloom.svn.cvsdude.com</id>
+      		<url>svn:https://mayloom.svn.cvsdude.com/toolsuite/repository</url>
+    	</repository>
+  	</distributionManagement>
+  	<scm>
+  		<!--
+  			mvn release:prepare -Dresume=false
+  			mvn release:perform  
+  			mvn install -DskipITs=true
+  		-->
+    	<connection>scm:svn:https://mayloom.svn.cvsdude.com/toolsuite/component/vouchserv-api/trunk</connection>
+    	<developerConnection>scm:svn:https://mayloom.svn.cvsdude.com/toolsuite/component/vouchserv-api/trunk</developerConnection>
+    	<url>https://mayloom.browse.cvsdude.com/cgi-bin/toolsuite/component/vouchserv-api</url>
+  	</scm>
+  	
+  	<properties>
+  		<skipITs>false</skipITs>
+    	<junit.version>4.10</junit.version>
+    	<apache.commons.lang.version>2.6</apache.commons.lang.version>
+    	<cxf.version>2.7.0</cxf.version>
+    	<xsd_content />
+  	</properties>
+  	  
+    <build>
+        <finalName>vouchserv-api</finalName>
+        <resources>
+        	<resource>
+        		<directory>src/main/resources</directory>
+        		<filtering>true</filtering>
+        		<includes>
+          			<include>**/*.wsdl</include>
+        		</includes>
+      		</resource>
+      		<resource>
+        		<directory>src/main/resources</directory>
+        		<filtering>false</filtering>
+        		<includes>
+          			<include>**/*.xsd</include>
+        		</includes>
+      		</resource>
+        </resources>
+        <plugins>
+        	<plugin>
+        		<!-- After execution of this plugin, you should be able to refer to ${xsd_content} property that contains vouchserv.xsd 
+        		file contents. -->
+  				<groupId>org.codehaus.gmaven</groupId>
+  				<artifactId>gmaven-plugin</artifactId>
+  				<version>1.4</version>
+  				<executions>
+    				<execution>
+      					<phase>generate-resources</phase>
+      					<goals>
+        					<goal>execute</goal>
+      					</goals>
+      					<configuration>
+        					<properties>
+          						<xsd_file>src/main/resources/vouchserv.xsd</xsd_file>
+        					</properties>
+        					<source>
+          						def xsd_file = new File(project.properties.xsd_file)
+          						project.properties.xsd_content = xsd_file.getText()
+          						
+          						// def xsd_content = xsd_file.getText()
+								// String testString='this is an xsd ${xsd_content}'
+								// println "As a string: " + testString
+								// def engine = new groovy.text.SimpleTemplateEngine()
+								// def template = engine.createTemplate(testString).make([xsd_content:xsd_content])
+								// println template.toString()
+        					</source>
+      					</configuration>
+    				</execution>
+  				</executions>
+			</plugin>
+        	<plugin>
+ 		  		<groupId>org.apache.maven.plugins</groupId>
+       	  		<artifactId>maven-compiler-plugin</artifactId>
+       	  		<version>2.3.2</version>
+ 			</plugin>
+        	<plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+            	<artifactId>maven-deploy-plugin</artifactId>
+            	<!-- http://maven.apache.org/plugins/maven-deploy-plugin/ -->
+            	<version>2.7</version>
+            	<dependencies>
+                	<dependency>
+                    	<groupId>com.google.code.maven-svn-wagon</groupId>
+                    	<artifactId>maven-svn-wagon</artifactId>
+                    	<version>1.4</version>
+                	</dependency>
+            	</dependencies>
+        	</plugin>
+        	<plugin>
+        		<groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-failsafe-plugin</artifactId>
+        		<version>2.12</version>
+        		<configuration>
+        			<skipITs>${skipITs}</skipITs>
+        		</configuration>
+        		<executions>
+          			<execution>
+            			<goals>
+              				<goal>integration-test</goal>
+              				<goal>verify</goal>
+            			</goals>
+          			</execution>
+        		</executions>
+      		</plugin>
+      		<!--  
+        	<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>${cxf.version}</version>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<sourceRoot>${basedir}/src/main/java/</sourceRoot>
+							<wsdlOptions>
+								<wsdlOption>
+									<wsdl>${basedir}/src/main/webapp/WEB-INF/wsdl/vouchserv.wsdl</wsdl>
+									<extraargs>
+                    					<extraarg>-verbose</extraarg>
+                					</extraargs>
+								</wsdlOption>
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			-->
+        </plugins>
+    </build>
+    
+    <dependencies>  
+		<dependency>
+      		<groupId>junit</groupId>
+      		<artifactId>junit</artifactId>
+      		<version>${junit.version}</version>
+      		<scope>test</scope>
+    	</dependency>
+    	<dependency>
+    		<groupId>commons-lang</groupId>
+    		<artifactId>commons-lang</artifactId>
+    		<version>${apache.commons.lang.version}</version>
+    		<scope>test</scope>
+		</dependency>
+    </dependencies>
+    
+</project>

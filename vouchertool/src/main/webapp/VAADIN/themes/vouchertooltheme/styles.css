@@ -1,0 +1,16 @@
+@import url(../reindeer/styles.css);
+
+.v-form fieldset {
+    border: thin solid;
+    padding: 6px;
+}
+
+/* Position icon right of the link caption. */
+.icon-after-caption {
+    direction: rtl;
+}
+/* Add some padding around the icon. */
+.icon-after-caption .v-icon {
+    padding: 0 3px;
+}
+
