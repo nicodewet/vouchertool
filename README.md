@@ -17,5 +17,8 @@ Vouchertool is composed of four modules and two run-time components:
  * [module] **vouchserv-api** - client-side Java API, wsdl and XSDs 
  * [module] **vouchserv** - core Java jar with clean DTO based service layer and JPA based persistence layer
 
-Note, I originally hosted vouchertool on www.vouchertool.com and developed it under my project portfolio name MAYLOOM. That said the 
+The actual UI has been developed using Vaadin since at the time I was a full stack backend developer with the stack ending at Vaadin 
+(thank heavens for small mercies).
+
+Note, I originally hosted vouchertool dot com and developed it under my project portfolio name MAYLOOM. That said the 
 source is now here under the Apache 2.0 licence.   
